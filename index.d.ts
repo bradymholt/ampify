@@ -1,4 +1,4 @@
-declare module "ampify" {
+declare module "@bradymholt/ampify" {
   export = ampify;
 }
 
