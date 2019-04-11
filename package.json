@@ -37,10 +37,8 @@
   "homepage": "https://github.com/bradymholt/ampify#readme",
   "dependencies": {
     "axios": "^0.18.0",
-    "cheerio": "^0.22.0",
-    "clean-css": "^4.2.1",
-    "image-size": "^0.7.3",
-    "pretty": "^2.0.0"
+    "cheerio": "^1.0.0-rc.3",
+    "image-size": "^0.7.3"
   },
   "devDependencies": {
     "eslint": "^5.16.0",

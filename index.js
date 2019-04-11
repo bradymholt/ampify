@@ -3,8 +3,6 @@ const url = require("url");
 const axios = require("axios");
 const cheerio = require("cheerio");
 const sizeOf = require("image-size");
-const CleanCss = require("clean-css");
-const pretty = require('pretty');
 
 module.exports = async (html, options) => {
   const cheerioOptions = options || {
@@ -20,8 +18,10 @@ module.exports = async (html, options) => {
 
   // Load html
   const $ = cheerio.load(html, cheerioOptions);
-
   const headElement = $("head");
+
+  let styles = "";
+  let scripts = "";
 
   /* AMP Boilerplate */
 
@@ -41,25 +41,24 @@ module.exports = async (html, options) => {
   );
 
   /* amp-boilerplate styles */
-  if (headElement.find("style[amp-boilerplate]").length === 0) {
-    headElement.append(
-      '<style amp-boilerplate="">body{-webkit-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-moz-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-ms-animation:-amp-start 8s steps(1,end) 0s 1 normal both;animation:-amp-start 8s steps(1,end) 0s 1 normal both}@-webkit-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-moz-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-ms-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-o-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}</style><noscript><style amp-boilerplate>body{-webkit-animation:none;-moz-animation:none;-ms-animation:none;animation:none}</style></noscript>'
-    );
-  }
+  headElement.find("style[amp-boilerplate]").remove();
+  headElement.append(
+    '<style amp-boilerplate="">body{-webkit-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-moz-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-ms-animation:-amp-start 8s steps(1,end) 0s 1 normal both;animation:-amp-start 8s steps(1,end) 0s 1 normal both}@-webkit-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-moz-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-ms-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-o-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}</style><noscript><style amp-boilerplate>body{-webkit-animation:none;-moz-animation:none;-ms-animation:none;animation:none}</style></noscript>'
+  );
 
   // AMP script
-  headElement.find("script[src*='cdn.ampproject.org']").remove();
-  headElement.append(
-    '<script async src="https://cdn.ampproject.org/v0.js"></script>'
-  );
+  if (
+    headElement.find("script[src='https://cdn.ampproject.org/v0.js']")
+      .length === 0
+  ) {
+    scripts += "<script async src='https://cdn.ampproject.org/v0.js'></script>";
+  }
 
   /* remove non-AMP scripts */
   $("script").each((index, element) => {
     const el = $(element);
-    if (
-      el.attr("custom-element") == "amp-analytics" ||
-      el.attr("src") && el.attr("src").indexOf("cdn.ampproject.org") > -1
-    ) {
+    if (el.attr("src") && el.attr("src").indexOf("cdn.ampproject.org") > -1) {
+      // This is an AMP script so leave it alone
       return;
     } else {
       el.remove();
@@ -150,7 +149,6 @@ module.exports = async (html, options) => {
   });
 
   /* Fetch external stylesheet content */
-  let styles = "";
   $("link[rel=stylesheet]").each((index, element) => {
     const src = $(element).attr("href");
     let path = src;
@@ -189,36 +187,55 @@ module.exports = async (html, options) => {
   });
 
   // Add styles to <head/>
-  const minifiedStyles = new CleanCss().minify(styles).styles;
-  const finalizedStyles = scrubCss(minifiedStyles);
+  const scrubbedStyles = scrubCss(styles);
   headElement.find("style[amp-custom]").remove();
-  headElement.append(`<style amp-custom>${finalizedStyles}</style>`);
+  headElement.append(`<style amp-custom>${scrubbedStyles}</style>`);
 
-  /* youtube */
-  let youTubeVideoEmbeded = false;
-  $(
-    'iframe[src*="http://www.youtube.com"],iframe[src*="https://www.youtube.com"],iframe[src*="http://youtu.be/"],iframe[src*="https://youtu.be/"]'
-  ).each((index, element) => {
-    youTubeVideoEmbeded = true;
-    const src = $(element).attr("src");
-    const width = $(element).attr("width");
-    const height = $(element).attr("height");
-    const path = url.parse(src).pathname.split("/");
-    const ampYoutube = `
+  // Handle iframes
+  let addYouTubeScript = false;
+  let addIFrameScript = false;
+  $("iframe").each((index, element) => {
+    const el = $(element);
+    const src = el.attr("src");
+    const width = el.attr("width");
+    const height = el.attr("height");
+
+    if (el.attr("src").match(/www\.youtu/)) {
+      addYouTubeScript = true;
+      const path = url.parse(src).pathname.split("/");
+      const ampYoutube = `
     <amp-youtube
       data-videoid="${path[path.length - 1]}"
       width="${width}"
       height="${height}"
       layout="responsive">
     </amp-youtube>`;
-    $(element).replaceWith(ampYoutube);
+      el.replaceWith(ampYoutube);
+    } else {
+      addIFrameScript = true;
+      const ampIFrame = `
+    <amp-iframe
+      src="${src}"
+      width="${width}"
+      height="${height}"
+      layout="responsive"
+      sandbox="allow-scripts">
+    </amp-iframe>`;
+      el.replaceWith(ampIFrame);
+    }
   });
 
-  if (youTubeVideoEmbeded) {
-    headElement.prepend(
-      '<script async custom-element="amp-youtube" src="https://cdn.ampproject.org/v0/amp-youtube-0.1.js">'
-    );
+  if (addYouTubeScript) {
+    scripts +=
+      "<script async custom-element='amp-youtube' src='https://cdn.ampproject.org/v0/amp-youtube-0.1.js'>";
   }
+  if (addIFrameScript) {
+    scripts +=
+      "<script async custom-element='amp-iframe' src='https://cdn.ampproject.org/v0/amp-iframe-0.1.js'></script>";
+  }
+
+  // Append scripts to <head/>
+  headElement.append(scripts);
 
   /* Convert HTML tags to AMP tags */
   const includeTags = {
@@ -232,8 +249,7 @@ module.exports = async (html, options) => {
   });
 
   const outerHtml = $.html();
-  const prettyOuterHtml = pretty(outerHtml);
-  return prettyOuterHtml;
+  return outerHtml;
 };
 
 function isGoogleFontHostSrc(src) {
