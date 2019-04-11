@@ -1,7 +1,7 @@
 {
   "name": "@bradymholt/ampify",
   "version": "0.1.0",
-  "publishConfig":{
+  "publishConfig": {
     "access": "public"
   },
   "description": "Convert plain HTML to Google Accelerated Mobile Pages (AMP)",
@@ -39,7 +39,8 @@
     "axios": "^0.18.0",
     "cheerio": "^0.22.0",
     "clean-css": "^4.2.1",
-    "image-size": "^0.7.3"
+    "image-size": "^0.7.3",
+    "pretty": "^2.0.0"
   },
   "devDependencies": {
     "eslint": "^5.16.0",
