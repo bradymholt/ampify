@@ -5,7 +5,7 @@
 ## Installation
 
 ```sh
-npm install ampify
+npm install @bradymholt/ampify
 ```
 
 ## Usage

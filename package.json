@@ -1,12 +1,15 @@
 {
-  "name": "ampify",
-  "version": "0.5.0",
+  "name": "@bradymholt/ampify",
+  "version": "0.1.0",
+  "publishConfig":{
+    "access": "public"
+  },
   "description": "Convert plain HTML to Google Accelerated Mobile Pages (AMP)",
   "main": "index.js",
   "types": "index.d.ts",
   "author": {
-    "name": "rkazakov",
-    "email": "ruslan.kazakov@gmail.com"
+    "name": "Brady Holt",
+    "email": "brady.holt@gmail.com"
   },
   "keywords": [
     "html",
@@ -26,12 +29,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/rkazakov/ampify.git"
+    "url": "git+https://github.com/bradymholt/ampify.git"
   },
   "bugs": {
-    "url": "https://github.com/rkazakov/ampify/issues"
+    "url": "https://github.com/bradymholt/ampify/issues"
   },
-  "homepage": "https://github.com/rkazakov/ampify#readme",
+  "homepage": "https://github.com/bradymholt/ampify#readme",
   "dependencies": {
     "axios": "^0.18.0",
     "cheerio": "^0.22.0",
