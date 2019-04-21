@@ -11,9 +11,9 @@ npm install @bradymholt/ampify
 ## Usage
 
 ```js
-const ampify = require('ampify');
-const html = '<YOUR_HTML_CONTENT>';
-const amp = await ampify(html, {cwd: 'amp'});
+const ampify = require("ampify");
+const html = "<YOUR_HTML_CONTENT>";
+const amp = await ampify(html, { cwd: "amp" });
 console.log(amp); // Content of AMP HTML
 ```
 
@@ -22,6 +22,8 @@ console.log(amp); // Content of AMP HTML
 ### cwd
 
 ### Assets (images/styles) file path
+
+When `<link rel=stylesheet>` and `<img/>` tags with a local file reference are encountered, they will read and processed. This option specifies where the files are located (i.e. `` fs.existsSync(`${options.cwd}/${imagSrc}`)) ``.
 
 - Type: `String`
 - Default: `''`
@@ -40,28 +42,29 @@ console.log(amp); // Content of AMP HTML
 ```html
 <html>
   <head>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.css" />
   </head>
-  <img src="image.png">
+  <body>
+    <img src="image.png" />
+  </body>
 </html>
 ```
 
 ### Output
 
 ```html
-<html amp="">
+<html amp>
   <head>
-    <style amp-custom="">body{background-color:#fff}</style>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+    <style amp-boilerplate>body{-webkit-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-moz-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-ms-animation:-amp-start 8s steps(1,end) 0s 1 normal both animation:-amp-start 8s steps(1,end) 0s 1 normal both}@-webkit-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-moz-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-ms-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-o-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}</style>
+    <noscript>
+      <style amp-boilerplate>body{-webkit-animation:none;-moz-animation:none;-ms-animation:none;animation:none}</style>
+    </noscript>
+    <script async src="https://cdn.ampproject.org/v0.js"></script>
   </head>
-  <amp-img src="image.png" width="600" height="400"></amp-img>
+  <body>
+    <amp-img src="image.png" width="600" height="400"></amp-img>
+  </body>
 </html>
 ```
-
-## Licence
-
-MIT (c) Ruslan Kazakov and [contributors](https://github.com/rkazakov/ampify/graphs/contributors)
-
-[PostXML]: https://github.com/postxml/postxml
-[npm-url]: https://www.npmjs.org/package/ampify
-[npm-image]: https://img.shields.io/npm/v/ampify.svg?style=flat-square
-[npm-downloads]: https://img.shields.io/npm/dm/ampify.svg?style=flat-square
