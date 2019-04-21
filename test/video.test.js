@@ -1,11 +1,11 @@
-const assert = require('./assert');
+const assert = require("./assert").includes;
 
-describe('amp-video tag', () => {
-  test('should replace video tag with amp-video', () => {
-    assert(
+describe("amp-video tag", () => {
+  test("should replace video tag with amp-video", async () => {
+    await assert(
       '<video src="test.mpg">',
       '<amp-video src="test.mpg"></amp-video>',
-      {},
+      {}
     );
   });
 });

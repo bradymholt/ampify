@@ -1,6 +1,12 @@
-const ampify = require('../');
+const ampify = require("../");
 
-module.exports = async (input, output, options) => {
+module.exports.equals = async (input, output, options) => {
   const processed = await ampify(input, options);
   expect(processed).toBe(output);
 };
+
+module.exports.includes = async (input, output, options) => {
+  const processed = await ampify(input, options);
+  expect(processed).toEqual(expect.stringContaining(output));
+};
+
