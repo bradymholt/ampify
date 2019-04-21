@@ -57,7 +57,10 @@ module.exports = async (html, options) => {
   /* remove non-AMP scripts */
   $("script").each((index, element) => {
     const el = $(element);
-    if (el.attr("src") && el.attr("src").indexOf("cdn.ampproject.org") > -1) {
+    if (
+      (el.attr("src") && el.attr("src").indexOf("cdn.ampproject.org") > -1) ||
+      el.parent()[0].tagName.startsWith("amp-")
+    ) {
       // This is an AMP script so leave it alone
       return;
     } else {
@@ -187,9 +190,11 @@ module.exports = async (html, options) => {
   });
 
   // Add styles to <head/>
-  const scrubbedStyles = scrubCss(styles);
-  headElement.find("style[amp-custom]").remove();
-  headElement.append(`<style amp-custom>${scrubbedStyles}</style>`);
+  if (styles) {
+    const scrubbedStyles = scrubCss(styles);
+    headElement.find("style[amp-custom]").remove();
+    headElement.append(`<style amp-custom>${scrubbedStyles}</style>`);
+  }
 
   // Handle iframes
   let addYouTubeScript = false;
