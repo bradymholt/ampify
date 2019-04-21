@@ -1,4 +1,4 @@
-# ampify
+# ampify [![NPM Package](https://img.shields.io/npm/v/@bradymholt/ampify.svg)](https://www.npmjs.com/package/@bradymholt/ampify)
 
 > Convert plain HTML to Google AMP (Accelerated Mobile Pages)
 
