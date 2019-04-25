@@ -18,6 +18,14 @@ describe("amp-img tag", () => {
     );
   });
 
+  test("should ignore hash fragment in image src", async () => {
+    await assert(
+      '<img src="image.png#pull-right">',
+      '<amp-img src="image.png#pull-right" width="600" height="400"></amp-img>',
+      { cwd: __dirname.split(path.sep).pop() }
+    );
+  });
+
   test("should remove invalid img tag", async () => {
     await assert("<img>", "", {});
   });

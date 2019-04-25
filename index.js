@@ -130,9 +130,13 @@ module.exports = async (html, options) => {
       return $(element).remove();
     }
     if (src.indexOf("//") === -1) {
-      const image = `${options.cwd}/${$(element).attr("src")}`;
-      if (fs.existsSync(image)) {
-        const size = sizeOf(image);
+      let imagePath = `${options.cwd}/${$(element).attr("src")}`;
+      if (imagePath.includes("#")) {
+        // Remove hash fragment from src
+        imagePath = imagePath.split("#")[0];
+      }
+      if (fs.existsSync(imagePath)) {
+        const size = sizeOf(imagePath);
         $(element).attr({
           width: round(size.width),
           height: round(size.height)
