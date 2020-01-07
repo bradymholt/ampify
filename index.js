@@ -25,7 +25,7 @@ module.exports = async (html, options) => {
 
   /* AMP Boilerplate */
 
-  // add amp atrribute to <html/> element
+  // add amp atrribute on root <html/>
   $("html")
     .first()
     .attr("amp", "");
@@ -34,13 +34,13 @@ module.exports = async (html, options) => {
   headElement.find("meta[charset]").remove();
   headElement.prepend('<meta charset="utf-8">');
 
-  /* meta viewport */
+  // Add meta viewport
   headElement.find("meta[name='viewport']").remove();
   headElement.append(
     '<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">'
   );
 
-  /* amp-boilerplate styles */
+  // AMP boilerplate styles
   headElement.find("style[amp-boilerplate]").remove();
   headElement.append(
     '<style amp-boilerplate="">body{-webkit-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-moz-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-ms-animation:-amp-start 8s steps(1,end) 0s 1 normal both;animation:-amp-start 8s steps(1,end) 0s 1 normal both}@-webkit-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-moz-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-ms-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-o-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}</style><noscript><style amp-boilerplate>body{-webkit-animation:none;-moz-animation:none;-ms-animation:none;animation:none}</style></noscript>'
@@ -54,7 +54,7 @@ module.exports = async (html, options) => {
     scripts += "<script async src='https://cdn.ampproject.org/v0.js'></script>";
   }
 
-  /* remove non-AMP scripts */
+  // Remove non-AMP scripts
   $("script").each((index, element) => {
     const el = $(element);
     if (
@@ -68,7 +68,7 @@ module.exports = async (html, options) => {
     }
   });
 
-  /* Fetch images and CSS */
+  // Fetch images and CSS
   const promises = [];
   const externalSrcContent = {};
 
@@ -123,7 +123,7 @@ module.exports = async (html, options) => {
 
   await Promise.all(promises);
 
-  /* Set <img/> element height/width dimensions */
+  // Set <img/> element height/width dimensions
   $("img:not([width]):not([height])").each((index, element) => {
     const src = $(element).attr("src");
     if (!src) {
@@ -155,7 +155,7 @@ module.exports = async (html, options) => {
     }
   });
 
-  /* Fetch external stylesheet content */
+  // Fetch external stylesheet content
   $("link[rel=stylesheet]").each((index, element) => {
     const src = $(element).attr("href");
     let path = src;
@@ -187,7 +187,7 @@ module.exports = async (html, options) => {
     $(element).remove();
   });
 
-  /* Gather internal styles */
+  // Gather internal styles
   $("style:not([amp-boilerplate])").each((index, element) => {
     styles += $(element).html();
     $(element).remove();
@@ -243,19 +243,29 @@ module.exports = async (html, options) => {
       "<script async custom-element='amp-iframe' src='https://cdn.ampproject.org/v0/amp-iframe-0.1.js'></script>";
   }
 
-  // Append scripts to <head/>
-  headElement.append(scripts);
-
-  /* Convert HTML tags to AMP tags */
+  // Convert other tags to AMP tags
+  let addVideoScript = false;
   const includeTags = {
     amp: ["img", "video"]
   };
   $(includeTags.amp.join(",")).each((index, element) => {
+    if (element.name == "video") {
+      addVideoScript = true;
+    }
+
     const ampElement = Object.assign(element, {
       name: `amp-${element.name}`
     });
     $(element).html($(ampElement).html());
   });
+
+  if (addVideoScript) {
+    scripts +=
+      "<script async custom-element='amp-video' src='https://cdn.ampproject.org/v0/amp-video-0.1.js'></script>";
+  }
+
+  // Append scripts to <head/>
+  headElement.append(scripts);
 
   const outerHtml = $.html();
   return outerHtml;
